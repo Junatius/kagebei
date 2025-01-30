@@ -13,6 +13,7 @@ use App\Models\Pengumuman;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnggotaController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,6 +28,16 @@ Route::middleware(['role:admin', 'log'])->group(function () {
 Route::middleware(['role:operator,gembala,user', 'log'])->group(function () {
     Route::get('/gereja/jemaat', [BerandaController::class, 'dashboardAdminGereja'])->name('admin.gereja.dashboard');
     Route::get('/gereja/keuangan', [TransaksiController::class, 'summary'])->name('laporan.summary');
+});
+
+Route::get('/run-migrations', function () {
+    // Run migrations and seeding
+    Artisan::call('migrate --seed');
+
+    return response()->json([
+        'message' => 'Migrations and seeders executed successfully!',
+        'output' => Artisan::output(),
+    ]);
 });
 
 Route::middleware(['role:admin,operator', 'log'])->group(function () {
